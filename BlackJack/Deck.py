@@ -17,7 +17,7 @@ class Deck():
                 deck[suit+(i*4),11] = Card(Suits(suit),"Q")
                 deck[suit+(i*4),12] = Card(Suits(suit),"K")
                 for value in range(1,10):
-                    deck[suit+(i*4),value] = Card(Suits(suit),value)
+                    deck[suit+(i*4),value] = Card(Suits(suit),value+1)
                 
         return deck.flatten()
 
