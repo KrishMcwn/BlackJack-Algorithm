@@ -8,4 +8,4 @@ Card2 = Card(Suits.Hearts,'A')
 
 deck = Deck(2)
 bj = BJGame()
-print(bj.play_round(100))
+print(bj.main(100))
