@@ -1,2 +1,3 @@
-# BlackJack-Algorithm
-Implementing basic strategy and Hi-Lo card counting to see if we can truly beat "fair" blackjack.
+# BlackJack-Bot
+Using object-detection, card counting and basic strategy to play perfect blackjack.
+Takes screenshots of the games and bets for you depending on the most optimal outcome.
