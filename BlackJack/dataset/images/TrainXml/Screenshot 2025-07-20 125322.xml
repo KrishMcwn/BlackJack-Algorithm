@@ -1,0 +1,50 @@
+<annotation>
+	<folder>train</folder>
+	<filename>Screenshot 2025-07-20 125322.png</filename>
+	<path>C:\Users\krish\PycharmProjects\BlackJack-Algorithm\BlackJack\dataset\images\train\Screenshot 2025-07-20 125322.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>157</width>
+		<height>99</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>k</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>35</xmin>
+			<ymin>12</ymin>
+			<xmax>62</xmax>
+			<ymax>42</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>4</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>61</xmin>
+			<ymin>11</ymin>
+			<xmax>91</xmax>
+			<ymax>42</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>q</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>90</xmin>
+			<ymin>12</ymin>
+			<xmax>118</xmax>
+			<ymax>41</ymax>
+		</bndbox>
+	</object>
+</annotation>

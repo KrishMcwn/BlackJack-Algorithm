@@ -1,0 +1,26 @@
+<annotation>
+	<folder>Val</folder>
+	<filename>Screenshot 2025-07-19 161728.png</filename>
+	<path>C:\Users\krish\PycharmProjects\BlackJack-Algorithm\BlackJack\Dataset\Images\Val\Screenshot 2025-07-19 161728.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>108</width>
+		<height>87</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>8</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>28</xmin>
+			<ymin>12</ymin>
+			<xmax>51</xmax>
+			<ymax>37</ymax>
+		</bndbox>
+	</object>
+</annotation>

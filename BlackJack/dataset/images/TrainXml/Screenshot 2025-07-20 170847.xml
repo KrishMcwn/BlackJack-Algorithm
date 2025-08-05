@@ -1,0 +1,38 @@
+<annotation>
+	<folder>Screenshots</folder>
+	<filename>Screenshot 2025-07-20 170847.png</filename>
+	<path>C:\Users\krish\Pictures\Screenshots\Screenshot 2025-07-20 170847.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>156</width>
+		<height>97</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>q</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>40</xmin>
+			<ymin>15</ymin>
+			<xmax>68</xmax>
+			<ymax>42</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>9</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>66</xmin>
+			<ymin>14</ymin>
+			<xmax>92</xmax>
+			<ymax>43</ymax>
+		</bndbox>
+	</object>
+</annotation>

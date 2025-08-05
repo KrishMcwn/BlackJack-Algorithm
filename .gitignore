@@ -6,7 +6,6 @@ __pycache__/
 # Project-specific ignores
 # Ignore YOLOv8 training runs and dataset
 runs/
-dataset/
 
 # C extensions
 *.so
