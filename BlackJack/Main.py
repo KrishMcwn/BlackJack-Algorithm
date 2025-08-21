@@ -13,46 +13,115 @@ from collections import deque
 # This makes the script runnable from anywhere and solves file path issues.
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# --- CONFIGURATION ---
-MODEL_PATH = os.path.join(script_dir, '..', 'runs', 'detect', 'best_model', 'weights', 'best.pt')
-OK_BUTTON_PATH = os.path.join(script_dir, 'ok_button.png')
-CONTINUE_BUTTON_PATH = os.path.join(script_dir, 'continue_button.png')
-ALL_BETS_BUTTON_PATH = os.path.join(script_dir, 'all_bets_button.png')
-SECOND_BUTTON_PATH = os.path.join(script_dir, 'second_button.png')
+# --- Set the Regions of the hands ---
+def select_capture_regions():
+    """
+    Allows the user to interactively select the screen regions for the dealer and players
+    at the start of the program. Returns the selected regions.
+    """
+    print("\n" + "=" * 50)
+    print("--- REGION SELECTION WIZARD ---")
+    print("You will now select three capture regions for the game.")
+    print("1. Draw a box around the specified area using your mouse.")
+    print("2. Press ENTER or SPACE to confirm the selection.")
+    print("3. Press 'c' to cancel and redraw the current selection.")
+    print("4. Press 'q' or ESC to quit the program entirely.")
+    print("=" * 50 + "\n")
 
-# --- SCREEN CAPTURE CONFIGURATION ---
-DEALER_CAPTURE_ZONE = {"top": 665, "left": 250, "width": 200, "height": 90}
-REGION_1_CAPTURE_ZONE = {"top": 890, "left": 460, "width": 270, "height": 90}
-REGION_2_CAPTURE_ZONE = {"top": 890, "left": 1430, "width": 270, "height": 90}
+    regions = {}
+    # Descriptive names for user guidance
+    region_prompts = {
+        "Dealer": "DEALER'S cards",
+        "Region 1": "the OTHER player's cards (or an empty area)",
+        "Region 2": "YOUR cards (the hand the bot will play)"
+    }
+    # The order in which we will select them
+    selection_order = ["Dealer", "Region 1", "Region 2"]
+
+    try:
+        with mss.mss() as sct:
+            # Grab the whole screen to select from
+            monitor = sct.monitors[1]  # Primary monitor
+            full_screen_img = np.array(sct.grab(monitor))
+            # Convert to BGR for OpenCV
+            full_screen_img_bgr = cv2.cvtColor(full_screen_img, cv2.COLOR_BGRA2BGR)
+    except mss.exception.ScreenShotError as e:
+        print(f"[FATAL] Could not capture the screen. Error: {e}")
+        return None, None, None
+
+    window_name = "Select Capture Regions - Press ENTER to confirm, Q to quit"
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)  # Make window resizable
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)  # Ensure it's on top
+    cv2.imshow(window_name, full_screen_img_bgr)
+
+    for name in selection_order:
+        prompt = region_prompts[name]
+        print(f"--> Please draw a box around {prompt} and press ENTER...")
+
+        # Allow user to select ROI
+        roi = cv2.selectROI(window_name, full_screen_img_bgr, fromCenter=False, showCrosshair=True)
+
+        # Check if the user cancelled the entire process
+        if roi == (0, 0, 0, 0):
+            print("[FATAL] Region selection cancelled by user. Exiting.")
+            cv2.destroyAllWindows()
+            return None, None, None
+
+        x, y, w, h = roi
+        # Store in the format mss expects
+        regions[name] = {"top": y, "left": x, "width": w, "height": h}
+
+        # Provide visual feedback by drawing the selected box
+        cv2.rectangle(full_screen_img_bgr, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.putText(full_screen_img_bgr, name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        cv2.imshow(window_name, full_screen_img_bgr)
+        print(f"    '{name}' region selected successfully.\n")
+
+    cv2.destroyAllWindows()
+    print("--- All regions selected. Starting the bot. ---")
+    # Return the regions in the order the original script expects
+    return regions["Dealer"], regions["Region 1"], regions["Region 2"]
+
+
+# --- CONFIGURATION ---
+# IMPORTANT: These files must exist in the same folder as this script.
+MODEL_PATH = os.path.join(script_dir, '.', 'models', 'best_model', 'weights', 'best.pt')
+OK_BUTTON_PATH = os.path.join(script_dir, './Images/ok_button.png')
+CONTINUE_BUTTON_PATH = os.path.join(script_dir, './Images/continue_button.png')
+HIT_BUTTON_IMAGE = os.path.join(script_dir, './Images/hitbutton.png')
+STAND_BUTTON_IMAGE = os.path.join(script_dir, './Images/standbutton.png')
+DOUBLE_BUTTON_IMAGE = os.path.join(script_dir, './Images/doublebutton.png')
+SPLIT_BUTTON_IMAGE = os.path.join(script_dir, './Images/splitbutton.png')
+
+INSURANCE_BUTTON = os.path.join(script_dir, './Images/insurance_button.png')
+
+'''
+ALL_BETS_BUTTON_PATH = os.path.join(script_dir, './Images/all_bets_button.png')
+SECOND_BUTTON_PATH = os.path.join(script_dir, './Images/second_button.png')
+'''
 
 # --- DETECTION & CLUSTERING CONFIGURATION ---
-CONFIDENCE_THRESHOLD = 0.8
-DBSCAN_EPS = 25
+CONFIDENCE_THRESHOLD = 0.8 #Minimum confident level to accept a card.
+DBSCAN_EPS = 25 #Maximum distance between two cards for them to be considered the hand.
 TEXT_AREA_HEIGHT = 200
 BUTTON_CHECK_INTERVAL = 1
-CONFIRMATION_PIXEL_THRESHOLD = 20
+CONFIRMATION_PIXEL_THRESHOLD = 20 # how far a card can move between two frames and still be considered the same card.
 
 # --- AUTOMATION CONFIGURATION ---
 ENABLE_AUTOMATION = True
 HIGH_COUNT_THRESHOLD = 5
 BET_LOCATION = (1560, 1030)  # (x, y) coordinate for placing a bet
 
-# IMPORTANT: These files must exist in the same folder as this script.
-HIT_BUTTON_IMAGE = os.path.join(script_dir, 'hitbutton.png')
-STAND_BUTTON_IMAGE = os.path.join(script_dir, 'standbutton.png')
-DOUBLE_BUTTON_IMAGE = os.path.join(script_dir, 'doublebutton.png')
-SPLIT_BUTTON_IMAGE = os.path.join(script_dir, 'splitbutton.png')
-
 # --- NEW: PRE-FLIGHT FILE CHECK ---
 # Verify that all necessary image files exist before starting.
 print("[INFO] Checking for required image files...")
 required_files = [
     OK_BUTTON_PATH,
+    CONTINUE_BUTTON_PATH,
     HIT_BUTTON_IMAGE,
     STAND_BUTTON_IMAGE,
     DOUBLE_BUTTON_IMAGE,
     SPLIT_BUTTON_IMAGE,
-    CONTINUE_BUTTON_PATH,
 ]
 all_files_found = True
 for file_path in required_files:
@@ -66,6 +135,15 @@ if not all_files_found:
         "Please ensure all button images are saved in the same directory as the script and the filenames are correct.")
     exit()
 print("[INFO] All required files found. Starting automation engine.")
+
+
+# --- LOAD THE MODEL ---
+try:
+    model = YOLO(MODEL_PATH)
+except Exception as e:
+    print(f"Error loading model: {e}")
+    exit()
+
 # --- END OF PRE-FLIGHT CHECK ---
 
 
@@ -110,13 +188,9 @@ STRATEGY_CHART = {
         '2': ['P', 'P', 'P', 'P', 'P', 'P', 'H', 'H', 'H', 'H'],
     }
 }
-
-# --- LOAD THE MODEL ---
-try:
-    model = YOLO(MODEL_PATH)
-except Exception as e:
-    print(f"Error loading model: {e}")
-    exit()
+# --- DICTIONARY FOR READABLE CARD NAMES ---
+CARD_NAME_MAP = {'a': 'A', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10',
+                 'j': 'J', 'q': 'Q', 'k': 'K'}
 
 def check_for_new_round_buttons(cards):
     """
@@ -457,11 +531,6 @@ def running_count_color(running_count):
     else:
         return (0, 255, 255)  # Yellow
 
-
-# --- DICTIONARY FOR READABLE CARD NAMES ---
-CARD_NAME_MAP = {'a': 'A', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10',
-                 'j': 'J', 'q': 'Q', 'k': 'K'}
-
 # --- STATE MANAGEMENT VARIABLES ---
 last_dealer_frame = None
 last_region_1_frame = None
@@ -479,6 +548,12 @@ all_last_cards = Counter()
 display_texts = []
 last_button_check_time = 0
 auto_play_in_progress = False
+
+# --- DYNAMICALLY SELECT CAPTURE ZONES ---
+DEALER_CAPTURE_ZONE, REGION_1_CAPTURE_ZONE, REGION_2_CAPTURE_ZONE = select_capture_regions()
+if DEALER_CAPTURE_ZONE is None:
+    # User cancelled the selection process.
+    exit()
 
 print("Starting live detection dashboard...")
 print("Press 'q' in the display window to quit.")
