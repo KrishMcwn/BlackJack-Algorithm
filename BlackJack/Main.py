@@ -544,16 +544,17 @@ region_1_historical_potentials = deque(maxlen=2)
 region_2_historical_potentials = deque(maxlen=2)
 
 running_count = 0
-all_last_cards = Counter()
+all_last_cards = Counter() #cards seen in the previous frame.
 display_texts = []
 last_button_check_time = 0
-auto_play_in_progress = False
+auto_play_in_progress = False #A boolean flag that tells the bot whether it's in the middle of playing a hand.
 
 # --- DYNAMICALLY SELECT CAPTURE ZONES ---
 DEALER_CAPTURE_ZONE, REGION_1_CAPTURE_ZONE, REGION_2_CAPTURE_ZONE = select_capture_regions()
 if DEALER_CAPTURE_ZONE is None:
     # User cancelled the selection process.
     exit()
+# ----------------------------------------
 
 print("Starting live detection dashboard...")
 print("Press 'q' in the display window to quit.")
@@ -561,9 +562,11 @@ print("Press 'q' in the display window to quit.")
 WINDOW_NAME = "Blackjack Analysis Dashboard"
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
 
+
 # --- MAIN LOOP FOR LIVE DETECTION ---
 with mss.mss() as sct:
     while True:
+        # --- Timed Button Check ---
         current_time = time.time()
         if current_time - last_button_check_time > BUTTON_CHECK_INTERVAL:
 
@@ -573,14 +576,15 @@ with mss.mss() as sct:
 
             check_for_new_round_buttons(cards_on_screen)
             last_button_check_time = current_time
+        # ---------------------------
 
         dealer_frame = np.array(sct.grab(DEALER_CAPTURE_ZONE))
         region_1_frame = np.array(sct.grab(REGION_1_CAPTURE_ZONE))
         region_2_frame = np.array(sct.grab(REGION_2_CAPTURE_ZONE))
 
         if not np.array_equal(dealer_frame, last_dealer_frame) or \
-                not np.array_equal(region_1_frame, last_region_1_frame) or \
-                not np.array_equal(region_2_frame, last_region_2_frame):
+           not np.array_equal(region_1_frame, last_region_1_frame) or \
+           not np.array_equal(region_2_frame, last_region_2_frame):
 
             dealer_frame_bgr = cv2.cvtColor(dealer_frame, cv2.COLOR_BGRA2BGR)
             region_1_frame_bgr = cv2.cvtColor(region_1_frame, cv2.COLOR_BGRA2BGR)

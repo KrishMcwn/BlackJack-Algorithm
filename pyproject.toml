@@ -1,0 +1,23 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "BlackJack-Algorithm"
+version = "1.0.0"
+description = "Using object-detection, card counting and basic strategy to play perfect blackjack. Takes screenshots of the games and bets for you depending on the most optimal outcome."
+
+# Your Python version requirement
+requires-python = ">=3.11"
+
+# Your project's dependencies from requirements.txt
+dependencies = [
+    "mss==10.1.0",
+    "numpy==2.3.2",
+    "opencv-python==4.12.0.88",
+    "pyautogui==0.9.54",
+    "scikit-learn==1.7.1",
+    "ultralytics==8.3.168",
+]
